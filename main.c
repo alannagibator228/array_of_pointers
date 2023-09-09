@@ -3,8 +3,8 @@
 
 int main()
 {
-    char* array [] = {};
-    int lenght = create_array_of_pointers(array);
+    char* array = NULL;
+    create_array_of_pointers(&array);
     
     return 0;
 }
