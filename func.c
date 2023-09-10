@@ -4,7 +4,7 @@
 #include "func.h"
 //-lasan -fsanitize=address -ggdb3
 
-void create_array_of_pointers(char** array)
+void create_array_of_pointers(char*** array, char ** buffer)
 {
     FILE *file;
     
@@ -13,15 +13,33 @@ void create_array_of_pointers(char** array)
     printf("Cannot open file.\n");
     }
     
-    char* buffer = NULL;
-    int size_plus_byte = cum_in_buffer(file, &buffer);
+    
+    int size_without_plus_byte = cum_in_buffer(file, buffer);
+    int size_plus_byte = size_without_plus_byte + 1;
 
-    for (int i = 0; i < size_plus_byte; i++)
+    ////////////////////// cum in array //or// memory for array
+    int length = 1;
+    for (int index = 1; index < size_without_plus_byte; index++)  // передать size_without_plus_byte
     {
-        printf("%c", buffer[i]);
+        if((*buffer)[index] == '\n')                 // передать buffer
+        {
+            length++;
+        }
+    }
+    *array = (char**) calloc(length, sizeof(char*)); // грамотно передать и использовать aaray // если делаю memory => return length;
+    
+    /////////////////////             //or// cum in array
+    (*array)[0] = *buffer;                               //впринципе передавать только array и buffer
+    int index_for_array = 1;
+    for (int index = 0; index < size_without_plus_byte; index++)  
+    {
+        if((*buffer)[index] == '\n')
+        {
+            (*array)[index_for_array] = *buffer + index + 1;
+            index_for_array++;
+        }
     }
 
-    free(buffer);
     fclose (file);
 }
 
@@ -29,12 +47,13 @@ int cum_in_buffer(FILE* file, char** buffer)
 {
     struct stat file_inf;
     fstat (fileno (file), &file_inf); 
-    int size_plus_byte = file_inf.st_size + 1; 
+    int size_without_plus_byte = file_inf.st_size; 
+    int size_plus_byte = size_without_plus_byte + 1;
     
     *buffer = (char*) calloc(size_plus_byte, sizeof(char)); 
-
-    fread(*buffer, sizeof(char), size_plus_byte, file);
+    
+    fread(*buffer, sizeof(char), size_without_plus_byte, file);
     (*buffer)[size_plus_byte - 1] = '\n';
 
-    return size_plus_byte;
+    return size_without_plus_byte;
 }
