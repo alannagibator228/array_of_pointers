@@ -4,7 +4,7 @@
 #include "func.h"
 //-lasan -fsanitize=address -ggdb3
 
-void create_array_of_pointers(char*** array, char ** buffer)
+int create_array_of_pointers(char*** array, char ** buffer)
 {
     FILE *file;
     
@@ -14,36 +14,17 @@ void create_array_of_pointers(char*** array, char ** buffer)
     }
     
     
-    int size_without_plus_byte = cum_in_buffer(file, buffer);
+    int size_without_plus_byte = write_in_buffer(file, buffer);
     int size_plus_byte = size_without_plus_byte + 1;
 
-    ////////////////////// cum in array //or// memory for array
-    int length = 1;
-    for (int index = 1; index < size_without_plus_byte; index++)  // передать size_without_plus_byte
-    {
-        if((*buffer)[index] == '\n')                 // передать buffer
-        {
-            length++;
-        }
-    }
-    *array = (char**) calloc(length, sizeof(char*)); // грамотно передать и использовать aaray // если делаю memory => return length;
-    
-    /////////////////////             //or// cum in array
-    (*array)[0] = *buffer;                               //впринципе передавать только array и buffer
-    int index_for_array = 1;
-    for (int index = 0; index < size_without_plus_byte; index++)  
-    {
-        if((*buffer)[index] == '\n')
-        {
-            (*array)[index_for_array] = *buffer + index + 1;
-            index_for_array++;
-        }
-    }
+    int length = memory_for_array (array, buffer, size_without_plus_byte);
+    write_in_array (array, buffer, size_without_plus_byte);
 
     fclose (file);
+    return length;
 }
 
-int cum_in_buffer(FILE* file, char** buffer)
+int write_in_buffer(FILE* file, char** buffer)
 {
     struct stat file_inf;
     fstat (fileno (file), &file_inf); 
@@ -56,4 +37,32 @@ int cum_in_buffer(FILE* file, char** buffer)
     (*buffer)[size_plus_byte - 1] = '\n';
 
     return size_without_plus_byte;
+}
+
+int memory_for_array (char*** array, char** buffer, int size_without_plus_byte)
+{
+    int length = 1;
+    for (int index = 1; index < size_without_plus_byte; index++)  
+    {
+        if((*buffer)[index] == '\n')                
+        {
+            length++;
+        }
+    }
+    *array = (char**) calloc(length, sizeof(char*));
+    return length;
+}
+
+void write_in_array (char*** array, char** buffer, int size_without_plus_byte)
+{
+    (*array)[0] = *buffer;                        
+    int index_for_array = 1;
+    for (int index = 0; index < size_without_plus_byte; index++)  
+    {
+        if((*buffer)[index] == '\n')
+        {
+            (*array)[index_for_array] = *buffer + index + 1;
+            index_for_array++;
+        }
+    }
 }
