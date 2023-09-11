@@ -66,3 +66,28 @@ void write_in_array (char*** array, char** buffer, int size_without_plus_byte)
         }
     }
 }
+
+void print_text(char** array, int length)
+{
+    for (int line_num = 0; line_num < length; line_num++)
+    {
+        print_line(array, line_num);
+        printf("\n");
+    }
+}
+
+void print_line(char** array, int line_num)
+{
+    int symbol_num = 0;
+        while (array[line_num][symbol_num] != '\n')
+        {
+            symbol_num++;
+        }
+    
+        int line_size = symbol_num;
+
+        for (symbol_num = 0; symbol_num < line_size; symbol_num++)
+        {
+            printf("%c", array[line_num][symbol_num]);
+        }
+}

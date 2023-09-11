@@ -6,4 +6,7 @@ int write_in_buffer(FILE* file, char** buffer);
 int memory_for_array (char*** array, char** buffer, int size_without_plus_byte);
 void write_in_array (char*** array, char** buffer, int size_without_plus_byte);
 
+void print_text(char** array, int length);
+void print_line(char** array, int line_num);
+
 #endif
